@@ -18,5 +18,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('news', [\App\Http\Controllers\Api\NewsController::class, 'index']);
+Route::resource('news', \App\Http\Controllers\Api\NewsController::class);
 Route::get('categories', [\App\Http\Controllers\Api\CategoryController::class, 'index']);
