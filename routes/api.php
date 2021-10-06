@@ -19,6 +19,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('register', [\App\Http\Controllers\Api\AuthController::class, 'register']);
+Route::post('login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
 
 Route::apiResource('news', \App\Http\Controllers\Api\NewsController::class);
 Route::get('categories', [\App\Http\Controllers\Api\CategoryController::class, 'index']);
