@@ -17,7 +17,7 @@ class AuthController extends Controller
     /**
      * Register a new user after a valid registration.
      *
-     * @param  RegisterRequest $request
+     * @param RegisterRequest $request
      * @return Application|ResponseFactory|Response
      */
     public function register(RegisterRequest $request)
@@ -29,6 +29,7 @@ class AuthController extends Controller
         ]);
 
         $token = $user->createToken('authToken')->plainTextToken;
+
         return response([
             'user' => $user,
             'access_token' => $token
@@ -38,23 +39,22 @@ class AuthController extends Controller
     /**
      * Sign in after a valid authentication.
      *
-     * @param  LoginRequest $request
+     * @param LoginRequest $request
      * @return Application|ResponseFactory|Response
      */
     public function login(LoginRequest $request)
     {
-        if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             $user = Auth::user();
 
-            $token =  $user->createToken('authToken')->plainTextToken;
+            $token = $user->createToken('authToken')->plainTextToken;
 
             return response([
                 'user' => $user,
                 'access_token' => $token
             ]);
-        }
-        else{
-            return response(['error'=>'Unauthorised'], 401);
+        } else {
+            return response(['error' => 'Unauthorised'], 401);
         }
     }
 }
