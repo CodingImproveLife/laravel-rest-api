@@ -33,7 +33,7 @@ class AuthController extends Controller
         return response([
             'user' => $user,
             'access_token' => $token
-        ]);
+        ], 201);
     }
 
     /**
@@ -52,9 +52,11 @@ class AuthController extends Controller
             return response([
                 'user' => $user,
                 'access_token' => $token
-            ]);
+            ], 200);
         } else {
-            return response(['error' => 'Unauthorised'], 401);
+            return response([
+                'message' => 'Unauthenticated.'
+            ], 401);
         }
     }
 }
