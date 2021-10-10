@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Category;
 use App\Models\News;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class NewsFactory extends Factory
@@ -25,6 +26,7 @@ class NewsFactory extends Factory
         return [
             'title' => $this->faker->text(50),
             'content' => $this->faker->paragraph(5),
+            'user_id' => User::all()->random()->id,
             'category_id' => Category::all()->random()->id,
         ];
     }
