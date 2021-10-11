@@ -5,38 +5,50 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\NewsResource;
 use App\Models\News;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class NewsController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->authorizeResource(News::class, 'news', ['except' => ['index', 'show', 'store']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
-     * @return Collection|News[]
+     * @return AnonymousResourceCollection
      */
     public function index()
     {
-        return News::all();
+        return NewsResource::collection(News::all());
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param Request $request
      * @return NewsResource
      */
     public function store(Request $request)
     {
-        $news = News::create($request->all());
+        $news = News::create([
+            'title' => $request['title'],
+            'content' => $request['content'],
+            'user_id' => Auth::id(),
+            'category_id' => $request['category_id']
+        ]);
         return new NewsResource($news);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  News $news
+     * @param News $news
      * @return NewsResource
      */
     public function show(News $news)
@@ -47,8 +59,8 @@ class NewsController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  Request $request
-     * @param  News $news
+     * @param Request $request
+     * @param News $news
      * @return NewsResource
      */
     public function update(Request $request, News $news)
@@ -60,7 +72,7 @@ class NewsController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  News $news
+     * @param News $news
      * @return \Illuminate\Http\Response
      */
     public function destroy(News $news)

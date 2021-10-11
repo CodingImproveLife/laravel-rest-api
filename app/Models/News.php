@@ -19,4 +19,19 @@ class News extends Model
         'content',
         'category_id',
     ];
+
+    /**
+     * The relationships that should always be loaded.
+     *
+     * @var array
+     */
+    protected $with = ['user'];
+
+    /**
+     * Get the author of the news.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
