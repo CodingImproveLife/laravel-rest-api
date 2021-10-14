@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\News\StoreRequest;
+use App\Http\Requests\News\UpdateRequest;
 use App\Http\Resources\NewsResource;
 use App\Models\News;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,17 +32,18 @@ class NewsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
+     * @param StoreRequest $request
+     * @param News $news
      * @return NewsResource
      */
-    public function store(Request $request)
+    public function store(StoreRequest $request, News $news)
     {
-        $news = News::create([
-            'title' => $request['title'],
-            'content' => $request['content'],
-            'user_id' => Auth::id(),
-            'category_id' => $request['category_id']
-        ]);
+        $news->title = $request['title'];
+        $news->content = $request['content'];
+        $news->user_id = Auth::id();
+        $news->category_id = $request['category_id'];
+        $news->save();
+
         return new NewsResource($news);
     }
 
@@ -59,11 +61,11 @@ class NewsController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
+     * @param UpdateRequest $request
      * @param News $news
      * @return NewsResource
      */
-    public function update(Request $request, News $news)
+    public function update(UpdateRequest $request, News $news)
     {
         $news->update($request->all());
         return new NewsResource($news);
