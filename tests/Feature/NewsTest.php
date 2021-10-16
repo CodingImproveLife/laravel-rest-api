@@ -19,6 +19,8 @@ class NewsTest extends TestCase
     private $content;
     private $category_id;
     private $news;
+    private $user;
+    private $notOwnerUser;
 
     public function setUp(): void
     {
@@ -26,10 +28,12 @@ class NewsTest extends TestCase
 
         $this->seed();
 
+        $this->user = User::all()->random();
+        $this->notOwnerUser = User::where('id', '<>', $this->user->id)->inRandomOrder()->first();
+
         $this->title = $this->faker->text(30);
         $this->content = $this->faker->paragraph(10);
         $this->category_id = Category::all()->random()->id;
-        $this->user = User::all()->random();
         $this->news = News::factory(['user_id' => $this->user->id])->create();
     }
 
@@ -51,6 +55,9 @@ class NewsTest extends TestCase
             ->assertJson([
                 'data' => [
                     'author' => $this->user->name,
+                    'title' => $this->news->title,
+                    'content' => $this->news->content,
+                    'category_id' => $this->news->category_id,
                 ]
             ]);
     }
@@ -110,5 +117,72 @@ class NewsTest extends TestCase
         $response = $this->deleteJson('/api/news/' . $this->news->id);
 
         $response->assertStatus(204);
+    }
+
+    public function test_not_authenticated_user_cannot_create_the_news()
+    {
+        $response = $this->postJson('/api/news', [
+            'title' => $this->title,
+            'content' => $this->content,
+            'category_id' => $this->category_id,
+        ]);
+
+        $response
+            ->assertStatus(401)
+            ->assertJson([
+                'message' => 'Unauthenticated.',
+            ]);
+    }
+
+    public function test_not_authenticated_user_cannot_update_the_news()
+    {
+        $response = $this->putJson('/api/news/' . $this->news->id, [
+            'title' => 'Some title',
+        ]);
+
+        $response
+            ->assertStatus(401)
+            ->assertJson([
+                'message' => 'Unauthenticated.',
+            ]);
+    }
+
+    public function test_not_authenticated_user_cannot_delete_the_news()
+    {
+        $response = $this->deleteJson('/api/news/' . $this->news->id);
+
+        $response
+            ->assertStatus(401)
+            ->assertJson([
+                'message' => 'Unauthenticated.',
+            ]);
+    }
+
+    public function test_not_owner_cannot_update_the_news()
+    {
+        Sanctum::actingAs($this->notOwnerUser);
+
+        $response = $this->putJson('/api/news/' . $this->news->id, [
+            'content' => 'Some content',
+        ]);
+
+        $response
+            ->assertStatus(403)
+            ->assertJson([
+                'message' => 'This action is unauthorized.',
+            ]);
+    }
+
+    public function test_not_owner_cannot_delete_the_news()
+    {
+        Sanctum::actingAs($this->notOwnerUser);
+
+        $response = $this->deleteJson('/api/news/' . $this->news->id);
+
+        $response
+            ->assertStatus(403)
+            ->assertJson([
+                'message' => 'This action is unauthorized.',
+            ]);
     }
 }
