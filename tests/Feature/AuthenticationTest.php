@@ -14,6 +14,7 @@ class AuthenticationTest extends TestCase
 
     private $user_name;
     private $user_email;
+    private $password;
 
     public function setUp(): void
     {
@@ -21,6 +22,7 @@ class AuthenticationTest extends TestCase
 
         $this->user_name = $this->faker->name();
         $this->user_email = $this->faker->safeEmail();
+        $this->password = 'password';
     }
 
     public function test_user_can_sign_up()
@@ -28,8 +30,8 @@ class AuthenticationTest extends TestCase
         $response = $this->postJson('/api/register', [
             'name' => $this->user_name,
             'email' => $this->user_email,
-            'password' => 'password',
-            'password_confirmation' => 'password',
+            'password' => $this->password,
+            'password_confirmation' => $this->password,
         ]);
 
         $response
@@ -55,7 +57,7 @@ class AuthenticationTest extends TestCase
         User::factory(['email' => $this->user_email])->create();
         $response = $this->postJson('/api/login', [
             'email' => $this->user_email,
-            'password' => 'password',
+            'password' => $this->password,
         ]);
 
         $response
